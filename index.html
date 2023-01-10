@@ -1,0 +1,613 @@
+<html>
+    <meta name="viewport" content="width=device-width">
+
+    <body id="paragraph">
+        <head>
+            <link rel="stylesheet" href="styles.css">
+        </head>
+    
+        <div id="overlay">
+            <h4 id="overlaytext">Loading</h4>
+        </div>
+    
+        <div class="title">
+            FWYL
+        </div>
+        
+        <div class="navbar">
+            <a onclick="backtohomepage()">首页</a>
+            <a>公告</a>
+            <div class="dropdown">
+              <button class="dropbtn">用户 
+                <i class="fa fa-caret-down"></i>
+              </button>
+              <div class="dropdown-content">
+                <a onclick="window.location.href = 'user.html';">个人信息</a>
+                <a onclick="window.location.href = 'TxtView.html';">站长特供小说╰(●’◡’●)╮</a>
+                <a onclick="window.location.href = 'login.html';">退出登录</a>
+              </div>
+            </div> 
+        </div>
+        
+        <h4 id="CurrentPath"></h4>
+    
+        <div style="display: flex;flex-direction:row;align-items: center;">
+            <button class="btn" id="backbutton" onclick="backtopreviouspage()">返 回</button>
+            <img id="boxsign" src="boxsign.jpg" title="图标显示" 
+                    onclick="if(getCookie('display')!='box'){
+                                listmethodswitch('box');
+                                window.location.href = 'index.html';}">
+            </img>
+            <img id="listsign" src="listsign.jpg" title="列表显示" 
+                    onclick="if(getCookie('display')!='list'){
+                                listmethodswitch('list');
+                                window.location.href = 'index.html';}">
+            </img>
+        </div>
+
+        <div class="flipbuttons">
+            <div>
+                <button class="btn" id="previouspage" onclick="postflipPageRequest('prevpage')">上一页</button>
+            </div>
+            <div class="pagecounter">
+                <h3 id="currentpage">-</h3>
+                <h3>/</h3>
+                <h3 id="totalpage">-</h3>
+            </div>
+            <div>
+                <button class="btn" id="nextpage" onclick="postflipPageRequest('nextpage')">下一页</button>
+            </div>
+        </div>
+
+        <div class="listclass">
+        </div>
+
+        <div class="imageclass">
+            <div class="firstcol">
+                <div class="imagebox">
+                    <img id="image1" src="" / onclick="updatecurrentdirectorybox(1)">
+                    <h4 class="IMGname" id="image1name"></h4>
+                </div>
+                <div class="imagebox">
+                    <img id="image2" src="" / onclick="updatecurrentdirectorybox(2)">
+                    <h4 class="IMGname" id="image2name"></h4>
+                </div>  
+                <div class="imagebox">
+                    <img id="image3" src="" / onclick="updatecurrentdirectorybox(3)">
+                    <h4 class="IMGname" id="image3name"></h4>
+                </div>   
+            </div>
+            
+            <div class="secondcol">
+                <div class="imagebox">
+                    <img id="image4" src="" / onclick="updatecurrentdirectorybox(4)">
+                    <h4 class="IMGname" id="image4name"></h4>
+                </div>
+                <div class="imagebox">
+                    <img id="image5" src="" / onclick="updatecurrentdirectorybox(5)">
+                    <h4 class="IMGname" id="image5name"></h4>
+                </div>
+                <div class="imagebox">
+                    <img id="image6" src="" / onclick="updatecurrentdirectorybox(6)">
+                    <h4 class="IMGname" id="image6name"></h4>
+                </div>  
+            </div>
+    
+            <div class="thirdcol">
+                <div class="imagebox">
+                    <img id="image7" src="" / onclick="updatecurrentdirectorybox(7)">
+                    <h4 class="IMGname" id="image7name"></h4>
+                </div>
+                <div class="imagebox">
+                    <img id="image8" src="" / onclick="updatecurrentdirectorybox(8)">
+                    <h4 class="IMGname" id="image8name"></h4>
+                </div>     
+                <div class="imagebox">
+                    <img id="image9" src="" / onclick="updatecurrentdirectorybox(9)">
+                    <h4 class="IMGname" id="image9name"></h4>
+                </div>
+            </div>
+            
+        </div>
+    </body>
+    
+    <script src="ExternalJS.js"></script>
+    
+    <script>
+        LoadingOverlayStyling(0,"enable");
+        var overlaychecker = 0;
+        
+        document.getElementById("CurrentPath").innerHTML = toStr(getCookie("currentpath"));
+
+        updateinnerhtml();
+        
+        for(var i=1;i<=20;i++){
+            addtolistclass(i);
+        }
+        listmethodswitch(getCookie("display"));
+
+        // setInterval(initDivMouseOver, 1000);
+
+        /*new method cookie*/
+        if(getCookie("display") == "box"){
+            postparsetobase64request(toStr(getCookie("currentdirectory")),toStr(getCookie("currentpage")));
+        }
+        else if(getCookie("display") == "list"){
+            postwithoutbase64request(toStr(getCookie("currentdirectory")),toStr(getCookie("currentpage")));
+        }
+        
+        function postparsetobase64request(currentdirectory, currentpage){
+            overlaychecker = 0;
+            LoadingOverlayStyling(1,"disable");
+            for(var i=1;i<=9;i++){
+                postparsetobase64request_helper(currentdirectory, currentpage, i);
+            }
+        }
+
+        function postwithoutbase64request(currentdirectory, currentpage){
+            overlaychecker = 0;
+            LoadingOverlayStyling(1,"disable");
+            for(var i=1;i<=20;i++){
+                /*clear text node*/
+                var root = document.getElementsByClassName("listnode")[i-1];
+                var y = root.childNodes[0];
+                root.innerHTML = "";
+                root.append(y);
+                // console.log(root);
+                document.getElementsByClassName("listnode")[i-1].style.display = "none";
+                postwithoutbase64request_helper(currentdirectory, currentpage, i);
+            }
+        }
+
+        function postparsetobase64request_helper(currentdirectory, currentpage, imageid){
+            clearallimage();
+            console.log(toStr(currentdirectory));
+            data = {currentdirectory: currentdirectory, currentpage: pasrsecurrentpagestring(), imageid: imageid, username: getCookie("username")}
+            fetch("http://fwyl.ignorelist.com/parsetobase64request",{
+                method: "POST",
+                // Format of the body must match the Content-Type
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify(data)
+            })
+            .then(res=>res.json())
+            .then(data=>{
+                if(data.msg=="success"){
+                    //console.log("receive image ---- "+data.imagestring);
+                    displaybase64stringToimagehelper("image"+data.imageid, data.imagestring, data.imagename);
+                    document.getElementById("totalpage").innerHTML=Math.ceil(data.numoffile/9);
+                    
+                    overlaychecker ++;
+                    if(overlaychecker == 9){
+                        LoadingOverlayStyling(0,"enable");
+                    }
+                }
+            })
+        }
+
+        function postwithoutbase64request_helper(currentdirectory, currentpage, imageid){
+            console.log(toStr(currentdirectory));
+            data = {currentdirectory: currentdirectory, currentpage: pasrsecurrentpagestring(), imageid: imageid, username: getCookie("username")}
+            fetch("http://fwyl.ignorelist.com/parsewithoutbase64request",{
+                method: "POST",
+                // Format of the body must match the Content-Type
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify(data)
+            })
+            .then(res=>res.json())
+            .then(data=>{
+                overlaychecker ++;
+
+                if(data.msg=="success"){
+                    //console.log("receive image ---- "+data.imagestring);
+                    document.getElementById("totalpage").innerHTML=Math.ceil(data.numoffile/20);
+
+                    var textnode=document.createTextNode(data.imagename);
+                    document.getElementsByClassName("listnode")[data.imageid-1].append(textnode);
+                    document.getElementsByClassName("listnode")[data.imageid-1].style.display = "block";
+                }
+
+                if(overlaychecker == 20){
+                    LoadingOverlayStyling(0,"enable");
+                }
+            })
+        }
+
+        async function displaybase64stringToimagehelper(imageid,datastring, dataname){
+            if(datastring != ""){
+                document.getElementById(imageid).src= "data:image/jpg;base64," + datastring;
+                //document.getElementById(imageid).src = await compress("data:image/png;base64,"+ datastring, 0.01);
+                boximagescale(imageid, datastring);
+                //document.getElementById(imageid).style.border = "thick solid #7700ff";
+                document.getElementById(imageid+"name").innerHTML=dataname;
+                document.getElementById(imageid).style.visibility = "visible";
+                document.getElementById(imageid+"name").style.visibility = "visible";
+                //console.log("rendered: "+imageid);
+                //console.log("rendered:"+document.getElementById(imageid).src);
+            }
+            else{
+                document.getElementById(imageid).style.visibility = "hidden";
+                document.getElementById(imageid+"name").style.visibility = "hidden";
+            }
+        }
+
+        function updatecurrentdirectorybox(imagenameid){
+            var newpath = document.getElementById("image"+imagenameid+"name").innerHTML;
+            var extension = newpath.slice(newpath.length-4,newpath.length);
+
+            if(extension !=".jpg" && extension !=".png" && extension !="jpeg" && extension !=".JPG"){ /*case 1: not in the last directory*/
+                console.log("Go to "+newpath);
+                var previousdirectory = toStr(getCookie("currentdirectory"));
+                var previouspath = toStr(getCookie("currentpath"));
+                document.cookie = "currentdirectory="+toUnicode(previousdirectory+"/"+newpath);
+                document.cookie = "currentpage="+getCookie("currentpage")+",1|"+getCookie("display");
+                document.cookie = "currentpath="+toUnicode(previouspath+" >> "+newpath);
+                
+                postparsetobase64request(toStr(getCookie("currentdirectory")),getCookie("currentpage"));
+
+                updateinnerhtml();
+            }
+            else{ /*case 2: in the last directory, click on an image*/
+                const tempArray = toStr(getCookie("currentpath")).split(" >> ");
+                //console.log(tempArray[tempArray.length-1]);
+                document.cookie = "Title=" + toUnicode(tempArray[tempArray.length-1]);  
+                document.cookie = "Pagelist=undefined";
+                var previousdirectory = toStr(getCookie("currentdirectory"));
+                document.cookie = "currentdirectory="+toUnicode(previousdirectory+"/"+newpath);
+                window.location.href = "ImgView.html";
+            }
+            
+        }
+
+        function updatecurrentdirectorylist(listid){
+            //get the file name innerhtml
+            var newpath = "";
+            var root = document.getElementsByClassName("listnode")[listid-1],
+                iter = document.createNodeIterator(root, NodeFilter.SHOW_TEXT),
+                textnode;
+            while (textnode = iter.nextNode()) {
+                newpath = newpath + textnode.textContent;
+            }
+            var extension = newpath.slice(newpath.length-4,newpath.length);
+
+            if(extension !=".jpg" && extension !=".png" && extension !="jpeg" && extension !=".JPG"){ /*case 1: not in the last directory*/
+                console.log("Go to "+newpath);
+                var previousdirectory = toStr(getCookie("currentdirectory"));
+                var previouspath = toStr(getCookie("currentpath"));
+                document.cookie = "currentdirectory="+toUnicode(previousdirectory+"/"+newpath);
+                document.cookie = "currentpage="+getCookie("currentpage")+",1;"+getCookie("display");
+                document.cookie = "currentpath="+toUnicode(previouspath+" >> "+newpath);
+                
+                postwithoutbase64request(toStr(getCookie("currentdirectory")),getCookie("currentpage"));
+
+                updateinnerhtml();
+            }
+            else{ /*case 2: in the last directory, click on an image*/
+                const tempArray = toStr(getCookie("currentpath")).split(" >> ");
+                //console.log(tempArray[tempArray.length-1]);
+                document.cookie = "Title=" + toUnicode(tempArray[tempArray.length-1]);  
+                document.cookie = "Pagelist=undefined";
+                var previousdirectory = toStr(getCookie("currentdirectory"));
+                document.cookie = "currentdirectory="+toUnicode(previousdirectory+"/"+newpath);
+                window.location.href = "ImgView.html";
+            }    
+        }
+
+        function updateinnerhtml(){
+            document.getElementById("CurrentPath").innerHTML=toStr(getCookie("currentpath"));
+            document.getElementById("currentpage").innerHTML=pasrsecurrentpagestring();
+        }
+
+        function postflipPageRequest(direction){
+            var currentpage = getCookie("currentpage");
+            var totalpage = document.getElementById("totalpage").innerHTML;
+
+            if(direction == "prevpage" && parseInt(pasrsecurrentpagestring()) > 1){
+                //console.log("prev");
+                document.cookie = "currentpage="+overwritecurrentpagestring(parseInt(parseInt(pasrsecurrentpagestring())-parseInt(1)));
+                if(getCookie("display")=="box"){
+                    postparsetobase64request(toStr(getCookie("currentdirectory")),getCookie("currentpage"));
+                }else if(getCookie("display")=="list"){
+                    postwithoutbase64request(toStr(getCookie("currentdirectory")),getCookie("currentpage"));
+                }
+                updateinnerhtml();
+            }
+            else if(direction == "nextpage" && parseInt(pasrsecurrentpagestring()) < parseInt(totalpage)){
+                //console.log("next");
+                document.cookie = "currentpage="+overwritecurrentpagestring(parseInt(parseInt(pasrsecurrentpagestring())+parseInt(1)));
+                if(getCookie("display")=="box"){
+                    postparsetobase64request(toStr(getCookie("currentdirectory")),getCookie("currentpage"));
+                }else if(getCookie("display")=="list"){
+                    postwithoutbase64request(toStr(getCookie("currentdirectory")),getCookie("currentpage"));
+                }
+                updateinnerhtml();
+            }
+        }
+
+        function backtopreviouspage(){
+            const tempdirectory = toStr(getCookie("currentdirectory")).split("/");
+            var directory = "";
+            const temppath = toStr(getCookie("currentpath")).split(" >> ");
+            var path = "";
+
+            data = {username: getCookie("username")}
+            fetch("http://fwyl.ignorelist.com/requirebasedirectory",{
+                method: "POST",
+                // Format of the body must match the Content-Type
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify(data)
+            })
+            .then(res=>res.json())
+            .then(data=>{
+                var directoryarray = data.basedir.split("/");
+
+                if(tempdirectory[tempdirectory.length-1] != directoryarray[directoryarray.length-1]){
+                    /*parse directory pass - remove the last element (below)*/
+                    for(var i=0;i<tempdirectory.length-2;i++){
+                        directory = directory + tempdirectory[i] + "/";
+                    }
+                    directory = directory + tempdirectory[tempdirectory.length-2];
+                    /*parse directory pass (above)*/
+
+                    /*parse path - remove the last element (below)*/
+                    for(var i=0;i<temppath.length-2;i++){
+                        path = path + temppath[i] + " >> ";
+                    }
+                    path = path + temppath[temppath.length-2];
+                    /*parse path (above)*/
+
+                    document.cookie = "currentdirectory=" + toUnicode(directory);
+                    document.cookie = "currentpath=" + toUnicode(path);
+                    document.cookie = "currentpage="+backtopreviouscurrentpage();
+                    window.location.href = "index.html";
+
+                    console.log("back to "+directory);
+
+                    if(getCookie("currentdirectory") == data.basedir){
+                        console.log("hide backbutton");
+                        document.getElementById("backbutton").style.display = "none";
+                    }else{
+                        document.getElementById("backbutton").style.display = "inline-block";
+                    }
+                }
+            })           
+        }
+        
+        function boximagescale(imagename, datastring){
+            const img = new Image();
+            img.src = "data:image/jpg;base64, "+ datastring;
+            img.onload = function() {
+                const width = img.naturalWidth;
+                const height = img.naturalHeight;
+                var windowwidth = window.innerWidth;
+                //console.log(imagename+" size: "+width + "  " + height);
+                if(width >= height){ /*横版图片*/
+                    var scaledbase;
+                    if(windowwidth<=1000){
+                        scaledbase = windowwidth/4;
+                    }
+                    else{
+                        scaledbase = windowwidth/6;
+                    }
+                    var scaledheight = (scaledbase) / width  * height;
+                    var scaledwidth = (scaledbase);
+                    //console.log(imagename+" case1: "+scaledwidth + "  " + scaledheight);
+                    document.getElementById(imagename).width = scaledwidth;
+                    document.getElementById(imagename).height = scaledheight;
+                }else if(width < height){ /*竖版图片*/
+                    var scaledbase;
+                    if(windowwidth<=1000){
+                        scaledbase = windowwidth/5;
+                    }
+                    else{
+                        scaledbase = windowwidth/7;
+                    }
+                    var scaledheight = (scaledbase) / width * height;
+                    var scaledwidth = (scaledbase);
+                    //console.log(imagename+" case2: "+scaledwidth + "  " + scaledheight);
+                    document.getElementById(imagename).width = scaledwidth;
+                    document.getElementById(imagename).height = scaledheight;
+                }
+            };
+        }
+
+        function listimagescale(id, datastring){
+            const img = new Image();
+            img.src = "data:image/jpg;base64, "+ datastring;
+            img.onload = function() {
+                const width = img.naturalWidth;
+                const height = img.naturalHeight;
+                var windowwidth = window.innerWidth;
+                //console.log(imagename+" size: "+width + "  " + height);
+                if(width >= height){ /*横版图片*/
+                    var scaledbase;
+                    if(windowwidth<=460){
+                        scaledbase = windowwidth/4;
+                    }
+                    else{
+                        scaledbase = windowwidth/6;
+                    }
+                    var scaledheight = (scaledbase) / width  * height;
+                    var scaledwidth = (scaledbase);
+                    //console.log(imagename+" case1: "+scaledwidth + "  " + scaledheight);
+                    document.getElementsByClassName("listnodeimage")[id-1].width = scaledwidth;
+                    document.getElementsByClassName("listnodeimage")[id-1].height = scaledheight;
+                    var srccounter=0;
+                    for(var i=1;i<=20;i++){
+                        if(document.getElementsByClassName("listnodeimage")[id-1].src == ""
+                            || document.getElementsByClassName("listnodeimage")[id-1].src =="http://fwyl.ignorelist.com/index.html"){
+                            srccounter++;
+                        }
+                    }
+                    if(srccounter == 20){
+                        document.getElementsByClassName("listnodeimage")[id-1].src = "data:image/jpg;base64, " + datastring;
+                        document.getElementsByClassName("myPopup")[id-1].setAttribute("style","visibility:visible");
+                        for(var i=1;i<=20;i++){
+                            if(i!=id){
+                                document.getElementsByClassName("listnodeimage")[i-1].src = "";
+                                var popup = document.getElementsByClassName("myPopup")[i-1];
+                                popup.setAttribute("style","visibility:hidden");
+                            }
+                        }
+                    }
+                }else if(width < height){ /*竖版图片*/
+                    var scaledbase;
+                    if(windowwidth<=460){
+                        scaledbase = windowwidth/5;
+                    }
+                    else{
+                        scaledbase = windowwidth/7;
+                    }
+                    var scaledheight = (scaledbase) / width * height;
+                    var scaledwidth = (scaledbase);
+                    
+                    document.getElementsByClassName("listnodeimage")[id-1].width = scaledwidth;
+                    document.getElementsByClassName("listnodeimage")[id-1].height = scaledheight;
+                    var srccounter=0;
+                    for(var i=1;i<=20;i++){
+                        if(document.getElementsByClassName("listnodeimage")[id-1].src == ""
+                        || document.getElementsByClassName("listnodeimage")[id-1].src =="http://fwyl.ignorelist.com/index.html"){
+                            srccounter++;
+                        }
+                    }
+                    if(srccounter == 20){
+                        document.getElementsByClassName("listnodeimage")[id-1].src = "data:image/jpg;base64, " + datastring;
+                        document.getElementsByClassName("myPopup")[id-1].setAttribute("style","visibility:visible");
+                        for(var i=1;i<=20;i++){
+                            if(i!=id){
+                                document.getElementsByClassName("listnodeimage")[i-1].src = "";
+                                var popup = document.getElementsByClassName("myPopup")[i-1];
+                                popup.setAttribute("style","visibility:hidden");
+                            }
+                        }
+                    }
+                }
+            };
+        }
+
+        function LoadingOverlayStyling(visibility,scroll){
+            if(visibility==1){
+                document.getElementById("overlay").style.visibility = "visible";
+            }
+            else if(visibility==0){
+                document.getElementById("overlay").style.visibility = "hidden";
+            }
+            
+            if(scroll == "enable"){
+                // window.onscroll = function(){};
+            }
+            else if(scroll == "disable"){
+                var mydiv = document.getElementById("overlay");
+                mydiv.addEventListener("mousewheel", MouseWheelHandler, false);
+            }
+        }
+
+        function MouseWheelHandler(e) {
+            var e = window.event || e; 
+            var delta = Math.max(-1, Math.min(1, (e.wheelDelta || -e.detail)));
+
+            e.preventDefault();
+            e.stopPropagation();
+            return false;
+        }
+
+        function addtolistclass(id){
+            var listnode = document.createElement("div");
+            var popupbox = document.createElement("span");
+            var image = document.createElement("img");
+            if(id==1){
+                listnode.setAttribute("style","	border: 3px solid #4b4b4b;");
+            }else{
+                listnode.setAttribute("style","	border-left: 3px solid #4b4b4b;border-right: 3px solid #4b4b4b;border-bottom: 3px solid #4b4b4b;");
+            }
+            image.setAttribute("class","listnodeimage");
+            listnode.setAttribute("class","listnode");
+            popupbox.setAttribute("class","popuptext myPopup");
+            popupbox.appendChild(image);
+            listnode.appendChild(popupbox);
+            listnode.onclick = function() {updatecurrentdirectorylist(id);};
+            listnode.onmouseenter = function() {onhover(id);};
+            listnode.onmouseleave = function() {offhover(id);};
+            document.getElementsByClassName("listclass")[0].appendChild(listnode);
+        }
+
+        function listmethodswitch(sign){
+            var boxsign = document.getElementById("boxsign");
+            var listsign = document.getElementById("listsign")
+            if(sign == "box"){
+                boxsign.setAttribute("style","filter: grayscale(1);");
+                listsign.setAttribute("style","filter: grayscale(0);");
+                document.cookie = "display=box";
+                document.getElementsByClassName("listclass")[0].style.display = "none";
+                document.getElementsByClassName("imageclass")[0].style.display = "block";      
+                var currentpagearray = getCookie("currentpage").split(",");
+                console.log(getCookie("currentpage"));
+                document.getElementById("currentpage").innerHTML = convertpage(currentpagearray[currentpagearray.length-1]);
+            }
+            else if(sign == "list"){
+                boxsign.setAttribute("style","filter: grayscale(0);");
+                listsign.setAttribute("style","filter: grayscale(1);");
+                document.cookie = "display=list";
+                document.getElementsByClassName("listclass")[0].style.display = "block";
+                document.getElementsByClassName("imageclass")[0].style.display = "none";
+                var currentpagearray = getCookie("currentpage").split(",");
+                console.log(getCookie("currentpage"));
+                document.getElementById("currentpage").innerHTML = convertpage(currentpagearray[currentpagearray.length-1]);
+            }
+        }
+
+        function onhover(id) {
+            var popup = document.getElementsByClassName("myPopup")[id-1];
+            popup.setAttribute("style","visibility:hidden");
+            //get textnode (hovered file name)
+            var root = document.getElementsByClassName("listnode")[id-1],
+                iter = document.createNodeIterator(root, NodeFilter.SHOW_TEXT),
+                textnode;
+            // print all text nodes
+            var innerhtml = "";
+            while (textnode = iter.nextNode()) {
+                innerhtml = innerhtml + textnode.textContent;
+            }
+
+            data = {directory: toStr(getCookie("currentdirectory"))+"/"+ innerhtml};
+            fetch("http://fwyl.ignorelist.com/requireimagepopup",{
+                method: "POST",
+                // Format of the body must match the Content-Type
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify(data)
+            })
+            .then(res=>res.json())
+            .then(data=>{
+                listimagescale(id, data.base64cache);
+            })
+        }
+
+        function offhover(id) {
+            document.getElementsByClassName("listnodeimage")[id-1].src = "";
+            var popup = document.getElementsByClassName("myPopup")[id-1];
+            popup.setAttribute("style","visibility:hidden");
+        }
+
+        function convertpage(currentpage){
+            var currentpagearray = currentpage.split("|");
+            var currentpagenumber = currentpagearray[0];
+            var currentpagedisplay = currentpagearray[1];
+            if(currentpagedisplay=="box" && getCookie("display")=="list"){/*convert box page to list page*/
+                var page = Math.ceil(9*(parseInt(currentpagenumber)-1)/20);
+                console.log("box to list");
+                if (page == 0) page = 1;
+                overwritecurrentpagestring(page);
+                return page;
+            }
+            else if(currentpagedisplay=="list" && getCookie("display")=="box"){/*convert list page to box page*/
+                var page = Math.ceil(20*(parseInt(currentpagenumber)-1)/9)+1;
+                console.log("list to box");
+                if (page == 0) page = 1;
+                overwritecurrentpagestring(page);
+                return page;
+            }
+            return currentpagenumber;
+        }
+    </script>
+
+</html>
+

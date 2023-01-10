@@ -1,0 +1,124 @@
+<html>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <body class="body">
+        <head>
+            <link rel="stylesheet" href="TxtViewStyle.css">
+        </head>
+
+        <div class="title">
+            FWYL
+        </div>
+        
+        <div class="navbar">
+            <a onclick="backtohomepage()">首页</a>
+            <a href="#news">公告</a>
+            <div class="dropdown">
+              <button class="dropbtn">用户 
+                <i class="fa fa-caret-down"></i>
+              </button>
+              <div class="dropdown-content">
+                <a onclick="window.location.href = 'user.html';">个人信息</a>
+                <a onclick="window.location.href = 'TxtView.html';">站长特供小说╰(●’◡’●)╮</a>
+                <a onclick="window.location.href = 'login.html';">退出登录</a>
+              </div>
+            </div> 
+        </div>
+
+        <h4 id="booktitle">Title</h4>
+
+        <div style="padding-top: 2%;">
+            <button class="btn" id="backbutton" onclick="backtopreviouspage()">返 回</button>
+        </div>
+
+        <div class="chinesetext" id="textcontent" style="text-align:center"></div>
+
+    </body>  
+
+    <script src="ExternalJS.js"></script>
+        
+    <script>
+        requestnovel();
+
+        function requestnovel(){
+            fetch("http://fwyl.ignorelist.com/requestnovel",{
+                method: "POST",
+                // Format of the body must match the Content-Type
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({})
+            })
+            .then(res=>res.json())
+            .then(data=>{
+                document.getElementById("booktitle").innerHTML = data.title;
+
+                for(var i=0;i<data.content.length;i++){
+                    var newtext = document.createElement("p");
+                    var newtextcontent = document.createTextNode(data.content[i]);
+                    newtext.appendChild(newtextcontent);
+                    if(data.content[i]!="        --------"){
+                        newtext.setAttribute("style","text-align: left;");
+                    }else{
+                        newtext.setAttribute("style","text-align: center;");
+                    }
+                    newtext.setAttribute("class","chinesetext");
+                    document.getElementById("textcontent").append(newtext);
+                }
+            })
+        }
+
+        function backtopreviouspage(){
+            const tempdirectory = toStr(getCookie("currentdirectory")).split("/");
+            var directory = "";
+            const temppath = toStr(getCookie("currentpath")).split(" >> ");
+            var path = "";
+            data={username: getCookie("username")}
+            fetch("http://fwyl.ignorelist.com/requirebasedirectory",{
+                method: "POST",
+                // Format of the body must match the Content-Type
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify(data)
+            })
+            .then(res=>res.json())
+            .then(data=>{
+                console.log("data.basedir"+data.basedir);
+                var directoryarray = data.basedir.split("/");
+
+                if(tempdirectory[tempdirectory.length-1] != directoryarray[directoryarray.length-1]){
+                    /*parse directory pass - remove the last element (below)*/
+                    for(var i=0;i<tempdirectory.length-2;i++){
+                        directory = directory + tempdirectory[i] + "/";
+                    }
+                    directory = directory + tempdirectory[tempdirectory.length-2];
+                    /*parse directory pass (above)*/
+
+                    /*parse path - remove the last element (below)*/
+                    for(var i=0;i<temppath.length-2;i++){
+                        path = path + temppath[i] + " >> ";
+                    }
+                    path = path + temppath[temppath.length-2];
+                    /*parse path (above)*/
+
+                    document.cookie = "currentdirectory=" + toUnicode(directory);
+                    document.cookie = "currentpath=" + toUnicode(path);
+                    document.cookie = "currentpage="+backtopreviouscurrentpage(parseInt(pasrsecurrentpagestring()));
+                    window.location.href = "index.html";
+
+                    console.log("back to "+directory);
+
+                    if(getCookie("currentdirectory") == data.basedir){
+                        console.log("hide backbutton");
+                        document.getElementById("backbutton").style.display = "none";
+                    }else{
+                        document.getElementById("backbutton").style.display = "inline-block";
+                    }
+                }
+                window.location.href = "index.html";
+            })           
+                
+        }
+        // function backtopreviouspage(){
+        //     window.location.href = "index.html";
+        // }
+    </script>
+
+</html>

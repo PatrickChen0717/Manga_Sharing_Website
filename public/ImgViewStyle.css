@@ -1,0 +1,143 @@
+.body{
+  margin: 0;
+  padding: 0;
+}
+
+.title{
+  line-height: 70px;
+  color:aliceblue;
+  background-color:cadetblue;
+  font-size: 30px;
+  font-weight: bold;
+  text-align: center;
+  letter-spacing: 0.5em;
+  margin-right:-0.5em;
+}
+
+#booktitle{
+  text-align: center;
+}
+
+#backbutton{
+  margin-left: 6%;
+  width: 80px;
+  height: 35px;
+}
+
+.flipbuttons{
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+
+.btn{
+  font-family: Helvetica, Tahoma, Arial, STXihei, “ Chinese is fine and black ”, Heiti, “ In black ”, “Microsoft YaHei”, “ Microsoft YaHei ”, SimSun, “ Song style ”, sans-serif;
+  border: 2px solid #000000;
+  width: 100px;
+  height: 35px;
+  font-weight: bold;
+  left: calc(50% - 50px);
+}
+
+.btn:hover {
+  background-color: #000000;
+  color: white;
+}
+
+#previouspage{
+  margin: 5px;
+  width:80px;
+  height:40px;
+}
+
+#nextpage{
+  margin: 5px;
+  width:80px;
+  height:40px;   
+}
+
+.pagecounter {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+
+#currentpage{
+  padding-left: 10%;
+  padding-right: 10%;
+}
+
+#totalpage{
+  padding-left: 10%;
+  padding-right: 10%;
+}
+
+.image{
+  display: flex;
+  justify-content: center;
+  padding-top: 20px;
+  padding-bottom: 60px;
+}
+
+/* Dropdown Button (below)*/
+.navbar {
+    overflow: hidden;
+    background-color: #333;
+  }
+  
+  .navbar a {
+    float: left;
+    font-size: 16px;
+    color: white;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+  }
+  
+  .dropdown {
+    float: left;
+    overflow: hidden;
+  }
+  
+  .dropdown .dropbtn {
+    font-size: 16px;  
+    border: none;
+    outline: none;
+    color: white;
+    padding: 14px 16px;
+    background-color: inherit;
+    font-family: inherit;
+    margin: 0;
+  }
+  
+  .navbar a:hover, .dropdown:hover .dropbtn {
+    background-color: red;
+  }
+  
+  .dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f9f9f9;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+  }
+  
+  .dropdown-content a {
+    float: none;
+    color: black;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+    text-align: left;
+  }
+  
+  .dropdown-content a:hover {
+    background-color: #ddd;
+  }
+  
+  .dropdown:hover .dropdown-content {
+    display: block;
+  }
+/* Dropdown Button (above)*/

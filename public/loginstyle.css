@@ -1,0 +1,212 @@
+#paragraph{
+    background-color: azure;
+    margin-top: 0px; 
+    margin-bottom: 0px; 
+    margin-left: 0px; 
+    margin-right: 0px;
+    padding: 0;
+}
+
+/*background: url(SakuraNoMachi.jpg);*/
+
+
+/*background-color:darkseagreen;*/
+.title{
+    background-image: url(096_73939947_p0.jpg);
+    background-size:cover;
+    color: aliceblue;
+    text-align:center;
+    justify-content: center;
+    font-weight:bolder;
+    font-weight: 1000;
+    -webkit-text-stroke: 1px black;
+}
+
+@media only screen and (min-width: 1000px) {
+    .title{
+        font-size:60px;
+        letter-spacing: 1em;
+        margin-right:-1em;
+        padding-top: 4%;
+        padding-bottom: 2.5%;
+        text-shadow:
+        3px 3px 0 #000,
+        -2px -2px 0 #000,  
+        1px -1px 0 #000,
+        -1px 1px 0 #000,
+        1px 1px 0 #000;
+    }
+    .TextBox{
+        width: 15%;
+    }
+}
+@media only screen and (max-width: 1000px) {
+    .title{
+        font-size:40px;
+        letter-spacing: 0.5em;
+        margin-right:-0.5em;
+        padding-top: 7%;
+        padding-bottom: 4%;
+        border: 20px;
+        border-color: #000;
+    }
+    .TextBox{
+        width: 30%;
+    }
+}
+
+form {
+    padding-top:5%;
+    text-align:center;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.TextBox{
+    height: 5%;
+    margin: 8px 0;
+    border-radius: 5px;
+}
+
+#TextBoxName{
+    font-weight: bold;
+}
+
+#invitcodeName{
+    font-weight: bold;
+}
+
+#invitTextBox{
+    height: 5%;
+    margin: 8px 0;
+    border-radius: 5px;
+}
+
+#register{
+    font-size:14px;
+    background-color: transparent;
+    border: none;
+    color:rgb(44, 17, 220);
+    font-family:'Courier New', Courier, monospace;
+    font-weight: bolder;
+    position: absolute;
+    height: 40px;
+    left: calc(50% + 85px);
+    letter-spacing: 0.2em;
+}
+#register:hover{
+    color:rgb(12, 26, 111);
+}
+
+#login{
+    position: absolute;
+    border: 2px solid #000000;
+    width:120px;
+    height: 40px;
+    font-weight: bold;
+    left: calc(50% - 60px);
+}
+
+#login:hover {
+    background-color: #000000;
+    color: white;
+}
+
+#footer{
+    width: 100%;
+    height: 20%;
+    position: absolute;
+    left: 0%;
+    bottom: 0;
+}
+
+#footer::after{
+    content: "";
+    background-size: 100% auto;
+    background-image: url(096_73939947_p0.jpg);
+    background-repeat: no-repeat;
+    background-position: center bottom;
+    opacity: 0.5;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    position: absolute;
+    z-index: -1;   
+}
+
+#facebooklogo{
+    width: 25px;
+    height: 25px;
+    position: relative;
+    float: right;
+    margin-top: 10px; 
+    padding-right: 4%;
+}
+
+#twitterlogo{
+    width: 25px;
+    height: 25px;
+    position: relative;
+    float: right;
+    margin-top: 10px; 
+    padding-right: 1%;
+}
+
+h4{
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    padding: 0;
+    font-size: 12px;
+    margin-top: 10px; 
+    margin-bottom: 0px; 
+    margin-left: 0px; 
+    margin-right: 0px;
+    float: right;
+    padding-right: 1%;
+}
+
+
+
+/* CSS for Pop up window below*/
+/* The Modal (background) */
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Sit on top */
+    padding-top: 100px; /* Location of the box */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+  }
+  
+  /* Modal Content */
+  .modal-content {
+    background-color: #fefefe;
+    margin: auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    font-size:14px;
+    font-weight: bold;
+  }
+  
+  /* The Close Button */
+  .close {
+    color: #aaaaaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+  }
+  
+  .close:hover,
+  .close:focus {
+    color: #000;
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  /* CSS for Pop up window above*/

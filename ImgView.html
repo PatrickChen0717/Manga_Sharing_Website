@@ -1,0 +1,186 @@
+<html>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <body class="body">
+        <head>
+            <link rel="stylesheet" href="ImgViewStyle.css">
+        </head>
+    
+        <div class="title">
+            FWYL
+        </div>
+        
+        <div class="navbar">
+            <a onclick="backtohomepage()">首页</a>
+            <a href="#news">公告</a>
+            <div class="dropdown">
+              <button class="dropbtn">用户 
+                <i class="fa fa-caret-down"></i>
+              </button>
+              <div class="dropdown-content">
+                <a onclick="window.location.href = 'user.html';">个人信息</a>
+                <a onclick="window.location.href = 'TxtView.html';">站长特供小说╰(●’◡’●)╮</a>
+                <a onclick="window.location.href = 'login.html';">退出登录</a>
+              </div>
+            </div> 
+        </div>
+        
+        <h4 id="booktitle">Title</h4>
+
+        <button class="btn" id="backbutton" onclick="backtopreviouspage()">返 回</button>
+
+        <div class="flipbuttons">
+            <div>
+                <button class="btn" id="previouspage" onclick="areaclicked('left')">上一页</button>
+            </div>
+            <div class="pagecounter">
+                <h2 id="currentpage">-</h2>
+                <h2> / </h2>
+                <h2 id="totalpage">-</h2>
+            </div>
+            <div>
+                <button class="btn" id="nextpage" onclick="areaclicked('right')">下一页</button>
+            </div>
+        </div>
+
+        <!-- <div class="imageclass">
+            <img id="image" src="" / width="214" height="204">
+            <h4 id="imagename">1</h4>
+        </div> -->
+        <div class="image">
+            <img id="image" src="" / alt="loading..." title="epac banner" usemap="#epacbanner" />
+            <map name="epacbanner">
+                <area shape="rect" onblur="this.focus()" id="leftclickable" onclick="areaclicked('left')" />
+                <area shape="rect" id="rightclickable" onclick="areaclicked('right')" />
+            </map>
+        </div>
+    </body>
+
+    <script src="ExternalJS.js"></script>
+
+    <script>
+        postIndividualImageRequest(toStr(getCookie("currentdirectory")), undefined, toStr(getCookie("Pagelist")));
+
+        //console.log(document.getElementById("image").width + "  " + document.getElementById("image").height);
+        
+        var windowwidth = window.innerWidth;
+        
+        //console.log(document.getElementById("leftclickable").coords);
+        //console.log(document.getElementById("rightclickable").coords);
+        
+        document.getElementById("booktitle").innerHTML = toStr(getCookie("Title"));
+
+        postgetcurrentpagenumber(toStr(getCookie("currentdirectory")));
+
+        function areaclicked(input){
+            var currentpagenumber = document.getElementById("currentpage").innerHTML;
+            var totalpagenumber = document.getElementById("totalpage").innerHTML;
+            
+            if(input=="left" && parseInt(currentpagenumber) > 1){
+                //console.log("left");
+                currentpagenumber = parseInt(parseInt(currentpagenumber) - parseInt(1));
+                //console.log("current page: "+ currentpagenumber);
+                postIndividualImageRequest(toStr(getCookie("currentdirectory")), currentpagenumber, toStr(getCookie("Pagelist")));
+                document.getElementById("currentpage").innerHTML = currentpagenumber;
+            }
+            else if(input=="right" && parseInt(currentpagenumber) < parseInt(totalpagenumber)){
+                //console.log("right");
+                currentpagenumber = parseInt(parseInt(currentpagenumber) + parseInt(1));
+                //console.log("current page: "+ currentpagenumber);
+                postIndividualImageRequest(toStr(getCookie("currentdirectory")), currentpagenumber, toStr(getCookie("Pagelist")));
+                document.getElementById("currentpage").innerHTML = currentpagenumber;
+            }
+        }
+
+        function imagescale(width,height){
+            var windowwidth = window.innerWidth;
+            if(width >= height){ /*横版图片*/
+                //console.log(width + "  " + height);
+                var scaledwidth;
+                if(windowwidth<=1000){
+                    scaledwidth = windowwidth*(19/20);
+                }
+                else{
+                    scaledwidth = windowwidth*(14/20);
+                }
+                var scaledheight = (scaledwidth) / width  * height;
+                //console.log(scaledwidth + "  " + scaledheight);
+                document.getElementById("image").width = scaledwidth;
+                document.getElementById("image").height = scaledheight;
+            }else if(width < height){ /*竖版图片*/
+                //console.log(width + "  " + height);
+                var scaledwidth;
+                if(windowwidth<=1000){
+                    scaledwidth = windowwidth*(14/15);
+                }
+                else{
+                    scaledwidth =windowwidth*(8/15);
+                }
+                var scaledheight =(scaledwidth) / width  * height;
+                //console.log(scaledwidth + "  " + scaledheight);
+                document.getElementById("image").width = scaledwidth;
+                document.getElementById("image").height = scaledheight;
+            }
+        }
+
+        function postIndividualImageRequest(currentdirectory, pagenumber, Pagelist){
+            data = {username: getCookie("username"),currentdirectory: currentdirectory, pagenumber: pagenumber, Pagelist:Pagelist}
+            fetch("http://fwyl.ignorelist.com/IndividualImageRequest",{
+                method: "POST",
+                // Format of the body must match the Content-Type
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify(data)
+            })
+            .then(res=>res.json())
+            .then(data=>{
+                document.getElementById("image").src="data:image/png;base64, "+ data.ImageString;
+                imagescale(data.width,data.height);
+                if(data.msg=="success 1.2"){
+                    document.cookie = "Pagelist="+toUnicode(data.pagelistarray);
+                }
+                //imagewidth = document.getElementById("image").width;
+                imageheight = document.getElementById("image").height;
+                // document.getElementById("booktitle").innerHTML = "left: 0,0," + parseInt(windowwidth/2) + "," + parseInt(imageheight) +
+                //                                                 "<br>right:"+parseInt(windowwidth/2) + ",0," + parseInt(windowwidth) + "," + parseInt(imageheight);
+                document.getElementById("leftclickable").coords =  "0,0," + parseInt(windowwidth/2) + "," + parseInt(imageheight);
+                document.getElementById("rightclickable").coords = parseInt(windowwidth/2) + ",0," + parseInt(windowwidth) + "," + parseInt(imageheight);
+            })
+        }
+
+        function postgetcurrentpagenumber(currentdirectory){
+            data = {currentdirectory: currentdirectory}
+            fetch("http://fwyl.ignorelist.com/getcurrentpagenumber",{
+                method: "POST",
+                // Format of the body must match the Content-Type
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify(data)
+            })
+            .then(res=>res.json())
+            .then(data=>{
+                if(data.msg=="success"){
+                    document.getElementById("currentpage").innerHTML = data.curentpagenumber;
+                    document.getElementById("totalpage").innerHTML = data.totalnumofpage;
+                    document.getElementById("flipbuttons").setAttribute("style","justify-content:center;align-items:center;");
+                }
+            })
+        }
+
+        function backtopreviouspage(){
+            /*parse directory pass (below)*/
+            const temp = toStr(getCookie("currentdirectory")).split("/");
+            var directory = "";
+            for(var i=0;i<temp.length-2;i++){
+                directory = directory + temp[i] + "/";
+            }
+            directory = directory + temp[temp.length-2];
+            /*parse directory pass (above)*/
+
+            document.cookie = "currentdirectory=" + toUnicode(directory);
+
+            window.location.href = "index.html";
+        }
+
+        
+    </script>
+
+</html>    

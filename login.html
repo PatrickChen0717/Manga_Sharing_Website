@@ -1,0 +1,258 @@
+<html>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <body id="paragraph">
+        <head>
+            <link rel="stylesheet" href="loginstyle.css">
+        </head>
+    
+        <div>
+            <p class="title">FWYL</p>
+        </div>
+        
+
+        <!-- The Modal -->
+        <div id="myModal" class="modal">
+            <!-- Modal content -->
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <p id="pop-out-text">用户名和密码组合错误</p>
+            </div>
+        </div>
+
+        <body>
+            <form>
+                <label for="fname" id="TextBoxName">用户名:</label>
+                <input type="text" class="TextBox" id="UsernameTextbox" name="Username" placeholder=" 输入用户名"><br>
+                <label for="lname" id="TextBoxName">密码:</label>
+                <input type="text" class="TextBox" id="PasswordTextbox" name="Password" placeholder=" 输入密码"><br>
+                <label for="invitcode" id="invitcodeName">邀请码:</label>
+                <input type="text" class="TextBox" id="invitTextBox" name="Password">
+            </form>
+        </body>
+    
+        <button id="register" onclick="regist()">
+            注册
+        </button>
+    
+        <button id="Login" onclick="submit()" href="index.html">登  录</button>
+
+        <div id="footer">
+            <div style="padding-top:5%"> 
+                <img src="facebooklogo.jpg" id="facebooklogo">
+                <img src="twitterlogo.png" id="twitterlogo">
+                <h4>本站仅用于学习交流，禁止任何商业用途</h4>
+                <h4>All rights reserved.</h4>
+            </div>
+        </div>
+    </body>
+    
+    <script src="ExternalJS.js"></script>
+
+
+    <script>
+        // if(getCookie("username")!=null){
+        //     window.location.href = "index.html";
+        // }
+
+        document.cookie = "username=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+        
+        var actionstatus=0; //login = 1; register =0;
+        document.getElementById("invitcodeName").style.display = "none";
+        document.getElementById("invitTextBox").style.display = "none";
+        function regist(){
+            if(actionstatus==0){
+                document.getElementById("invitcodeName").style.display = "inline-block";
+                document.getElementById("invitTextBox").style.display = "inline-block";
+                document.getElementById("UsernameTextbox").placeholder=" 请输入新用户名";
+                document.getElementById("PasswordTextbox").placeholder=" 请输入新密码";
+                document.getElementById("invitTextBox").placeholder = " 请输入站长邀请码";
+                actionstatus = 1;
+                document.getElementById('register').innerHTML = '返回登录';
+                document.getElementById('Login').innerHTML = '立  即  注  册';
+                document.getElementById("UsernameTextbox").value="";
+                document.getElementById("PasswordTextbox").value="";
+                document.getElementById("invitTextBox").value="";
+            }
+            else if(actionstatus==1){
+                document.getElementById("invitcodeName").style.display = "none";
+                document.getElementById("invitTextBox").style.display = "none";
+                document.getElementById("UsernameTextbox").placeholder=" 输入用户名";
+                document.getElementById("PasswordTextbox").placeholder=" 输入密码";
+                actionstatus = 0;
+                document.getElementById('register').innerHTML = '注册';
+                document.getElementById('Login').innerHTML = '登  录';
+                document.getElementById("UsernameTextbox").value="";
+                document.getElementById("PasswordTextbox").value="";
+                document.getElementById("invitTextBox").value="";
+            }
+        }
+
+        function submit(){
+            var inputusername=document.getElementById("UsernameTextbox").value;
+            var inputpassword=document.getElementById("PasswordTextbox").value;
+            if(actionstatus==0){ 
+                console.log("1.username:"+inputusername+" password:"+inputpassword);
+                data = {action:"login", username: inputusername, password: inputpassword}
+                fetch("http://fwyl.ignorelist.com/userinfocheckrequest",{
+                    method: "POST",
+                    headers: {"Content-Type": "application/json"},
+                    body: JSON.stringify(data)
+                })
+                .then(res=>res.json())
+                .then(data=>{
+                    if(data.msg=="success"){
+                        //display();
+                        //eraseCookie();
+                        document.cookie = "username="+data.username+"; path=/";
+                        document.cookie = "currentdirectory="+toUnicode(data.basedir);
+                        document.cookie = "currentpage=1|box";
+                        
+                        document.cookie = "currentpath="+toUnicode("当前路径：首页");
+                        //document.cookie = "currentpath=check";
+                        console.log("user log in successful");
+                        //console.log(document.cookie);
+                        console.log(toStr(getCookie("currentdirectory")));
+                        document.cookie = "display=box";
+                        window.location.href = "index.html";
+                    }
+                    else{
+                        document.getElementById("pop-out-text").innerHTML = "用户名和密码组合错误";
+                        modal.style.display = "block";
+                        console.log("user log in unsuccessful");
+                    }
+                })
+            }
+            else if(actionstatus==1){
+
+                if(RegisterInfoFormatCheck(inputusername,inputpassword)==false){
+                    document.getElementById("pop-out-text").innerHTML = "密码或用户名不符合格式"
+                                                                    +"<br>1. 用户名/密码 不得少于6位"
+                                                                    +"<br>2. 用户名/密码 不得包含特殊符号"
+                                                                    +"<br>3. 密码必须包含至少一个大写字母,一个小写字母和一个数字";
+                    modal.style.display = "block";
+                    return false;
+                }
+                
+                var inputinvitecode=document.getElementById("invitTextBox").value;
+                //console.log("2.username:"+inputusername + " password:"+inputpassword + " invitecode:"+inputinvitecode);
+                data = {action:"register", username: inputusername, password: inputpassword, invitecode: inputinvitecode}
+                fetch("http://fwyl.ignorelist.com/userinfocheckrequest",{
+                    method: "POST",
+                    headers: {"Content-Type": "application/json"},
+                    body: JSON.stringify(data)
+                })
+                .then(res=>res.json())
+                .then(data=>{
+                    if(data.msg=="success"){
+                        document.getElementById("pop-out-text").innerHTML = "注册成功";
+                        modal.style.display = "block";
+                        actionstatus == 0;
+                        regist();
+                    }
+                    else{
+                        document.getElementById("pop-out-text").innerHTML = "邀请码错误";
+                        modal.style.display = "block";
+                        console.log("user register unsuccessful");
+                    }
+                })
+            }
+        }
+
+        function RegisterInfoFormatCheck(inputusername,inputpassword){
+            //rule 1: username need at least 6 charactors
+            if(inputusername.length < 6) return false;
+
+            //rule 2: password need at least 6 charactors
+            if(inputpassword.length < 6) return false;
+
+            //rule 3: username can not contain symbols
+            for(var i=0;i<inputusername.length;i++){
+                if(isLetter(inputusername[i]) == false && isNumber(inputusername[i]) == false){
+                    return false;
+                }
+            }
+
+            //rule 4: password can not contain , or ;
+            for(var i=0;i<inputpassword.length;i++){
+                if(inputpassword[i] == "," || inputpassword[i] == ";"){
+                    return false;
+                }
+            }
+
+            //rule 5: at least a number, a capital letter, a lower letter
+            var number = 0;
+            var cletter = 0;
+            var lletter = 0;
+            for(var i=0;i<inputpassword.length;i++){
+                if(isNumber(inputpassword[i]) == true) number++;
+                else if(isupper(inputpassword[i]) == true) cletter++;
+                else if(islower(inputpassword[i]) == true) lletter++;
+            }
+
+            if(number==0 || cletter==0 || lletter==0) return false;
+
+            return true
+        }
+
+
+        function display() { 
+            var now = new Date();
+            var time = now.getTime();
+            var expireTime = time + 3600 * 1000;
+            now.setTime(expireTime);
+            document.cookie = 'cookie=ok;expires='+now.toUTCString()+';path=/';
+            //console.log(document.cookie);  // 'Wed, 31 Oct 2012 08:50:17 UTC'
+        }
+
+        function isNumber(char) {
+            if (typeof char !== 'string') {
+            return false;
+            }
+        
+            if (char.trim() === '') {
+            return false;
+            }
+        
+            return !isNaN(char);
+        }
+
+        function isLetter(str) {
+            return str.length === 1 && str.match(/[a-z]/i);
+        }
+
+        function isupper(myString) { 
+            return (myString == myString.toUpperCase()); 
+        } 
+        function islower(myString) { 
+            return (myString == myString.toLowerCase()); 
+        } 
+    </script>
+
+
+    <!--javascript for handling open and close of the pop up window (below)-->
+    <script> 
+        // Get the modal
+        var modal = document.getElementById("myModal");
+
+        // Get the button that opens the modal
+        var btn = document.getElementById("facebooklogo");
+
+        // Get the <span> element that closes the modal
+        var span = document.getElementsByClassName("close")[0];
+
+        btn.onclick = function() {
+            modal.style.display = "block";
+        }
+        span.onclick = function() {
+            modal.style.display = "none";
+        }
+
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+    </script>
+
+</html>

@@ -1,0 +1,384 @@
+<html>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <body class="body">
+        <head>
+            <link rel="stylesheet" href="userstyle.css">
+        </head>
+
+        <div class="title">
+            FWYL
+        </div>
+        
+        <div class="navbar">
+            <a onclick="backtohomepage()">首页</a>
+            <a href="#news">公告</a>
+            <div class="dropdown">
+              <button class="dropbtn">用户 
+                <i class="fa fa-caret-down"></i>
+              </button>
+              <div class="dropdown-content">
+                <a onclick="window.location.href = 'user.html';">个人信息</a>
+                <a onclick="window.location.href = 'TxtView.html';">站长特供小说╰(●’◡’●)╮</a>
+                <a onclick="window.location.href = 'login.html';">退出登录</a>
+              </div>
+            </div> 
+        </div>
+
+        <div style="padding-top: 2%;">
+            <button class="btn" id="backbutton" onclick="backtopreviouspage()">返 回</button>
+        </div>
+        
+        <div class="profile">
+            <img id="profileIMG" src="tempprofileIMG.jpg" style="width:180px;height:180px;margin-top:3%;border:3px solid rgba(44, 2, 83, 0.767);border-radius:5%"></img>
+            <div id="profileusername"></div>
+            <div style="padding-bottom: 1%; padding-top: 1%;">   
+                <label class="chinesetext" id="chooseimagetext">
+                    选取本地图片
+                    <input type="file" id="file-selector" accept=".jpg, .jpeg, .png">
+                    <br/>
+                    <span id="imageName" style="color:rgb(169, 27, 240);"></span>
+                </label>
+            </div>
+            <button class="btn" onclick="submit()">上传头像</button>
+        </div>
+
+        <div style="padding-top: 3%;">
+            <div id="historytext">用户资料</div>
+            <div class="chinesetext" style="text-align:center; padding-top:1%; padding-bottom:1%;">性别:
+                <text class="chinesetext" id="saved-sex" style="padding-left:2%; padding-right:2%;">不详</text>
+                <label for="sex"></label>
+                <select name="sex" id="sex" style="padding-left:2%; padding-right:2%;">
+                    <option class="chinesetext" value="男">男</option>
+                    <option class="chinesetext" value="女">女</option>
+                </select>
+            </div>
+            <hr style="width:60%;">
+            <div style="text-align:center; padding-top:1%; padding-bottom:1%;">
+                <text class="chinesetext">年龄:</text>
+                <text class="chinesetext" id="saved-age" style="padding-left:2%; padding-right:2%;">不详</text>
+                <label for="age"></label>
+                <select name="age" id="age" style="padding-left:2%; padding-right:2%;"></select>
+            </div>
+            <hr style="width:60%;">
+            <div style="text-align:center; padding-top:1%; padding-bottom:1%;">
+                <text class="chinesetext">生日:</text>
+                <text class="chinesetext" id="saved-birthdaymonth" style="padding-left:2%; padding-right:1%;">不详</text>
+                <label for="birthday"></label>
+                <select name="birthday" id="birthdaymonth" style="padding-left:2%; padding-right:1%;"></select>
+                <text class="chinesetext">月</text>
+                <text class="chinesetext" id="saved-birthdayday" style="padding-left:2%; padding-right:1%;">不详</text>
+                <label for="birthday"></label>
+                <select name="birthday" id="birthdayday" style="padding-left:1%; padding-right:1%;"></select>
+                <text class="chinesetext" >日</text>
+            </div>
+        </div>
+
+        <div style="text-align:center; padding-top:1%;">
+            <button class="btn" id="userinfo-btn" onclick="saveorchange()">修改</button>
+        </div>
+
+        <div style="padding-top:5%; padding-bottom:5%;">
+            <div id="historytext" style="padding-bottom:2%;">浏览记录</div>
+            <td style="width:100%;">
+                <div id="programmingLog">
+                    <div id="HistoryLog"
+                        style="color:black">
+                    </div>
+                </div>
+            </td>
+        </div>
+
+    </body>  
+        
+    <script src="ExternalJS.js"></script>
+
+    <script>
+        document.getElementById("sex").style.display="none";
+        document.getElementById("age").style.display="none";
+        document.getElementById("birthdaymonth").style.display="none";
+        document.getElementById("birthdayday").style.display="none";
+        createoptions("age",1,100);
+        createoptions("birthdaymonth",1,12);
+        createoptions("birthdayday",1,31);
+        displayInfo();
+
+        var fileList;
+        const fileSelector = document.getElementById('file-selector');
+        fileSelector.addEventListener('change', (event) => {
+            fileList = event.target.files;
+            document.getElementById("imageName").innerHTML = fileList[0].name;
+            document.getElementById("imageName").style.display = "inline-block";
+        });
+
+        const toBase64 = file => new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = error => reject(error);
+        });
+      
+        async function submit() {
+            console.log(fileList);
+            if(fileList != undefined){
+                const imagebase64 = await imagerender(await toBase64(fileList[0]));
+                document.getElementById("imageName").style.display = "none";
+                
+                data = {UserName:getCookie('username'), ProfileImg:imagebase64}
+                fetch("http://fwyl.ignorelist.com/uploadprofileimage",{
+                    method: "POST",
+                    headers: {"Content-Type": "application/json"},
+                    body: JSON.stringify(data)
+                })
+                .then(res=>res.json())
+                .then(data=>{
+                    document.getElementById("profileIMG").src = data.ProfileImg;
+                    document.getElementById("imageName").innerHTML = "";
+                    fileList = undefined;
+                })
+            } 
+            else{
+                document.getElementById("imageName").innerHTML = "请选取图片";
+                document.getElementById("imageName").style.display = "inline-block";
+            }
+        }
+
+        function displayInfo(){
+            document.getElementById('profileusername').innerHTML = getCookie('username');
+            document.getElementById("imageName").style.display = "none";
+
+            data = {UserName:getCookie('username')}
+            fetch("http://fwyl.ignorelist.com/requestprofile",{
+                    method: "POST",
+                    headers: {"Content-Type": "application/json"},
+                    body: JSON.stringify(data)
+            })
+            .then(res=>res.json())
+            .then(data=>{
+                if(data.ProfileImg!="null"){
+                    //console.log("checker"+data.ProfileImg);
+                    document.getElementById("profileIMG").src = data.ProfileImg;
+                }
+                document.getElementById("saved-"+"age").innerHTML = data.age;
+                document.getElementById("saved-"+"sex").innerHTML = data.sex;
+                document.getElementById("saved-"+"birthdayday").innerHTML = data.birthdayday;
+                document.getElementById("saved-"+"birthdaymonth").innerHTML = data.birthdaymonth;
+                requesthistory();
+            })
+        }
+
+        function requesthistory(){
+            data = {UserName:getCookie('username')}
+            fetch("http://fwyl.ignorelist.com/requesthistory",{
+                    method: "POST",
+                    headers: {"Content-Type": "application/json"},
+                    body: JSON.stringify(data)
+            })
+            .then(res=>res.json())
+            .then(data=>{
+                const base64cachearray = data.base64cachearray;
+ 
+                for(var i=0;i<5;i++){
+
+                    if(base64cachearray[i]!=""){
+                        var flexbox = document.createElement('td');
+                        var newimage = document.createElement('img');
+                        var newimagename = document.createElement('p');
+
+                        flexbox.setAttribute("style","display:flex;justify-content:center");
+                        flexbox.setAttribute("style","flex-direction:column;");
+                        flexbox.setAttribute("style","width:180px; padding:10px");
+                        
+                        newimage.setAttribute("style","justify-content:center");
+                        newimage.setAttribute("src", "data:image/png;base64, "+base64cachearray[i]);
+                        newimage.setAttribute("id","temphistoryimage"+i);
+
+                        var text = document.createTextNode(data.directoryarray[i]);
+                        newimagename.appendChild(text);
+                        newimagename.setAttribute("style", "text-align:center;font-size:13px;");
+                        newimagename.setAttribute("id","temphistoryimagename"+i);
+                        newimagename.setAttribute("style", "overflow:hidden; white-space:nowrap; text-overflow:ellipsis;max-width:180px;");
+                        
+                        flexbox.appendChild(newimage);
+                        flexbox.appendChild(newimagename);
+                        document.getElementById("HistoryLog").append(flexbox);
+                        
+                    }
+                }
+
+                for(var i=0;i<5;i++){
+                    if(base64cachearray[i]!=""){
+                        var width = imagescale("temphistoryimage"+i, base64cachearray[i]);
+                        document.getElementById("temphistoryimage"+i).setAttribute("style","padding-left:calc(50%-"+width/2+");");
+                        //document.getElementById("temphistoryimagename"+i).setAttribute("style", "text-align:center;");
+                        //document.getElementById("temphistoryimagename"+i).setAttribute("style", "max-width:"+width+"px;");
+                        
+                    }
+                }
+            })
+        }
+
+        function imagescale(imagename, datastring){
+            const img = new Image();
+            img.src = "data:image/jpg;base64, "+ datastring;
+            img.onload = function() {
+                const width = img.naturalWidth;
+                const height = img.naturalHeight;
+                //console.log(imagename+" size: "+width + "  " + height);
+                if(width >= height){ /*横版图片*/
+                    var scaledheight = 180 / width  * height;
+                    var scaledwidth = 180;
+                    //console.log(imagename+" case1: "+scaledwidth + "  " + scaledheight);
+                    document.getElementById(imagename).width = scaledwidth;
+                    document.getElementById(imagename).height = scaledheight;
+                    return scaledwidth;
+                }else if(width < height){ /*竖版图片*/
+                    var scaledheight = 140 / width * height;
+                    var scaledwidth = 140;
+                    //console.log(imagename+" case2: "+scaledwidth + "  " + scaledheight);
+                    document.getElementById(imagename).width = scaledwidth;
+                    document.getElementById(imagename).height = scaledheight;
+                    return scaledwidth;
+                }
+            };
+        }
+
+        async function imagerender(datastring){
+            let resized_base64 = await new Promise((resolve) => {
+                let img = new Image()
+                img.src = datastring
+                img.onload = () => {
+                    let canvas = document.createElement('canvas')
+
+                    canvas.width = 180
+                    canvas.height = 180
+                    let ctx = canvas.getContext('2d')
+                    ctx.drawImage(img, 0, 0, 180, 180)
+                    resolve(canvas.toDataURL('image/png',1.0)) // this will return base64 image results after resize
+                }
+            });
+            return resized_base64;
+        }
+
+        function createoptions(id,startvalue,endvalue){
+            for(var i=startvalue;i<=endvalue;i++){
+                var tempoption = document.createElement('option');
+                tempoption.appendChild(document.createTextNode(i));
+                document.getElementById(id).append(tempoption);
+            }
+        }
+
+        function saveorchange(){
+            if(document.getElementById("userinfo"+"-btn").innerHTML == "修改"){
+                document.getElementById("age").style.display="inline-block";
+                document.getElementById("sex").style.display="inline-block";
+                document.getElementById("birthdayday").style.display="inline-block";
+                document.getElementById("birthdaymonth").style.display="inline-block";
+                document.getElementById("saved-"+"age").style.display="none";
+                document.getElementById("saved-"+"sex").style.display="none";
+                document.getElementById("saved-"+"birthdayday").style.display="none";
+                document.getElementById("saved-"+"birthdaymonth").style.display="none";
+
+                document.getElementById("userinfo"+"-btn").innerHTML = "保存";
+            }
+            else if(document.getElementById("userinfo"+"-btn").innerHTML == "保存"){
+                var selectage = document.getElementById("age");
+                var selectsex = document.getElementById("sex");
+                var selectbirthdayday = document.getElementById("birthdayday");
+                var selectbirthdaymonth = document.getElementById("birthdaymonth");
+                var textage = selectage.options[selectage.selectedIndex].text;
+                var textsex = selectsex.options[selectsex.selectedIndex].text;
+                var textbirthdayday = selectbirthdayday.options[selectbirthdayday.selectedIndex].text;
+                var textbirthdaymonth = selectbirthdaymonth.options[selectbirthdaymonth.selectedIndex].text;
+
+                document.getElementById("saved-"+"age").style.display="inline-block";
+                document.getElementById("saved-"+"sex").style.display="inline-block";
+                document.getElementById("saved-"+"birthdayday").style.display="inline-block";
+                document.getElementById("saved-"+"birthdaymonth").style.display="inline-block";
+                document.getElementById("age").style.display="none";
+                document.getElementById("sex").style.display="none";
+                document.getElementById("birthdayday").style.display="none";
+                document.getElementById("birthdaymonth").style.display="none";
+
+                document.getElementById("saved-"+"age").innerHTML = textage;
+                document.getElementById("saved-"+"sex").innerHTML = textsex;
+                document.getElementById("saved-"+"birthdayday").innerHTML = textbirthdayday;
+                document.getElementById("saved-"+"birthdaymonth").innerHTML = textbirthdaymonth;
+
+                document.getElementById("userinfo"+"-btn").innerHTML = "修改";
+
+                uploaduserinfo(textsex,textage,textbirthdaymonth,textbirthdayday);
+            }
+        }
+
+        function uploaduserinfo(textsex,textage,textbirthdaymonth,textbirthdayday){
+            data = {UserName: getCookie('username'),
+                     sex: textsex,
+                     age: textage,
+                     birthdaymonth: textbirthdaymonth,
+                     birthdayday: textbirthdayday}
+            fetch("http://fwyl.ignorelist.com/uploaduserinfo",{
+                    method: "POST",
+                    headers: {"Content-Type": "application/json"},
+                    body: JSON.stringify(data)
+            })
+        }
+
+        function backtopreviouspage(){
+            const tempdirectory = toStr(getCookie("currentdirectory")).split("/");
+            var directory = "";
+            const temppath = toStr(getCookie("currentpath")).split(" >> ");
+            var path = "";
+            data={username: getCookie("username")}
+            fetch("http://fwyl.ignorelist.com/requirebasedirectory",{
+                method: "POST",
+                // Format of the body must match the Content-Type
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify(data)
+            })
+            .then(res=>res.json())
+            .then(data=>{
+                console.log("data.basedir"+data.basedir);
+                var directoryarray = data.basedir.split("/");
+
+                if(tempdirectory[tempdirectory.length-1] != directoryarray[directoryarray.length-1]){
+                    /*parse directory pass - remove the last element (below)*/
+                    for(var i=0;i<tempdirectory.length-2;i++){
+                        directory = directory + tempdirectory[i] + "/";
+                    }
+                    directory = directory + tempdirectory[tempdirectory.length-2];
+                    /*parse directory pass (above)*/
+
+                    /*parse path - remove the last element (below)*/
+                    for(var i=0;i<temppath.length-2;i++){
+                        path = path + temppath[i] + " >> ";
+                    }
+                    path = path + temppath[temppath.length-2];
+                    /*parse path (above)*/
+
+                    document.cookie = "currentdirectory=" + toUnicode(directory);
+                    document.cookie = "currentpath=" + toUnicode(path);
+                    document.cookie = "currentpage="+backtopreviouscurrentpage(parseInt(pasrsecurrentpagestring()));
+                    window.location.href = "index.html";
+
+                    console.log("back to "+directory);
+
+                    if(getCookie("currentdirectory") == data.basedir){
+                        console.log("hide backbutton");
+                        document.getElementById("backbutton").style.display = "none";
+                    }else{
+                        document.getElementById("backbutton").style.display = "inline-block";
+                    }
+                }
+                window.location.href = "index.html";
+            })           
+                
+        }
+
+        // function backtopreviouspage(){
+        //     window.location.href = "index.html";
+        // }
+
+    </script>
+
+</html>
